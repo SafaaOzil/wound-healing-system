@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}
+User Management - WoundCare
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header-row">
+
+    <div>
+
+        <h1>User Management</h1>
+
+        <p>
+            Manage system users and access roles.
+        </p>
+
+    </div>
+
+    <a
+        href="{{ url_for('add_user') }}"
+        class="primary-button"
+    >
+        + Add User
+    </a>
+
+</div>
+
+
+<div class="table-container">
+
+    <table class="data-table">
+
+        <thead>
+
+            <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Action</th>
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for user in users %}
+
+                <tr>
+
+                    <td>
+                        {{ user.full_name }}
+                    </td>
+
+                    <td>
+                        {{ user.username }}
+                    </td>
+
+                    <td>
+                        {{ user.role }}
+                    </td>
+
+                    <td>
+
+                        {% if user.is_active %}
+
+                            <span class="status-active">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-inactive">
+                                Inactive
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ user.created_at.strftime("%d/%m/%Y") }}
+                    </td>
+
+                    <td>
+
+                        {% if user.id != g.user.id %}
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('toggle_user', user_id=user.id) }}"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="secondary-button"
+                                >
+
+                                    {% if user.is_active %}
+                                        Deactivate
+                                    {% else %}
+                                        Activate
+                                    {% endif %}
+
+                                </button>
+
+                            </form>
+
+                        {% else %}
+
+                            Current User
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

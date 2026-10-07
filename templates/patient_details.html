@@ -47,7 +47,19 @@ Patient Details - WoundCare
         <strong>Total Wounds:</strong>
         {{ patient.wounds|length }}
     </p>
+<a
+    href="{{ url_for('patient_report', patient_db_id=patient.id) }}"
+    class="secondary-button"
+>
+    Generate Patient Report
+</a>
 
+<a
+    href="{{ url_for('export_patient_pdf', patient_db_id=patient.id) }}"
+    class="secondary-button"
+>
+    Export PDF
+</a>
 </div>
 
 
@@ -124,7 +136,12 @@ Patient Details - WoundCare
 >
     Compare Visits
 </a>
-
+<a
+    href="{{ url_for('export_wound_csv', wound_id=wound.id) }}"
+    class="secondary-button"
+>
+    Export CSV
+</a>
 
                 </div>
 

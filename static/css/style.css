@@ -586,3 +586,75 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+
+.login-page {
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 430px;
+    background-color: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+    padding: 35px;
+}
+
+.login-card h1 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.login-subtitle {
+    text-align: center;
+    color: #666666;
+    margin-bottom: 30px;
+}
+
+.login-button {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.logged-user {
+    color: #666666;
+    font-size: 14px;
+}
+
+.status-active {
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.status-inactive {
+    font-weight: bold;
+    color: #b3261e;
+}
+
+.data-table form {
+    margin: 0;
+}
+
+
+.report-header,
+.report-section,
+.report-footer {
+    background-color: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.report-section h3 {
+    margin-top: 0;
+}
+
+.report-footer {
+    color: #666666;
+    font-size: 14px;
+}

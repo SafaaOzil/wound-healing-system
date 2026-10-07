@@ -2,8 +2,13 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>
         {% block title %}
@@ -15,7 +20,9 @@
         rel="stylesheet"
         href="{{ url_for('static', filename='css/style.css') }}"
     >
+
 </head>
+
 
 <body>
 
@@ -25,14 +32,58 @@
             WoundCare
         </div>
 
+
         <div class="nav-links">
-<a href="{{ url_for('dashboard') }}">Dashboard</a>
-<a href="{{ url_for('patients') }}">Patients</a>
-            <a href="#">Wounds</a>
-            <a href="#">Audit Trail</a>
+
+            {% if g.user %}
+
+                <a href="{{ url_for('dashboard') }}">
+                    Dashboard
+                </a>
+
+                <a href="{{ url_for('patients') }}">
+                    Patients
+                </a>
+
+                <a href="#">
+                    Wounds
+                </a>
+
+                {% if g.user.role == "ADMIN" %}
+
+    <a href="{{ url_for('audit_trail') }}">
+                        Audit Trail
+                    </a>
+
+                {% endif %}
+
+                {% if g.user.role == "ADMIN" %}
+
+                    <a href="{{ url_for('manage_users') }}">
+                        Users
+                    </a>
+
+                {% endif %}
+
+
+                <span class="logged-user">
+
+                    {{ g.user.full_name }}
+                    ({{ g.user.role }})
+
+                </span>
+
+
+                <a href="{{ url_for('logout') }}">
+                    Logout
+                </a>
+
+            {% endif %}
+
         </div>
 
     </nav>
+
 
     <main class="main-container">
 
@@ -40,6 +91,10 @@
         {% endblock %}
 
     </main>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </body>
+
 </html>
