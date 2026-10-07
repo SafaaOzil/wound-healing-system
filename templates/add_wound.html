@@ -28,11 +28,689 @@ Add Wound - WoundCare
             </label>
 
             <input
+        type="text"
+        id="location"
+        name="location"
+        placeholder="Select from body map or enter location manually"
+        required
+    >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                More Specific Location
+            </label>
+
+            <input
                 type="text"
-                name="location"
-                placeholder="Example: Left lower leg"
-                required
+                id="specific_location"
+                placeholder="Example: near ankle / upper outer arm / left scapula"
             >
+
+        </div>
+
+
+        <div class="selected-region-box">
+
+            <strong>Selected Area:</strong>
+            <span id="selected-area-label">
+                No area selected
+            </span>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                 Select Wound Location on Body Map (Optional)
+            </label>
+
+            <div class="anatomy-map-grid">
+
+                <!-- FRONT -->
+                <div class="anatomy-card">
+
+                    <h3>Front View</h3>
+
+                    <svg
+                        class="anatomy-svg"
+                        viewBox="0 0 260 560"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <!-- Base silhouette -->
+                        <ellipse cx="130" cy="50" rx="28" ry="32" class="body-base"></ellipse>
+
+                        <path
+                            d="M112 82
+                               Q130 74 148 82
+                               L148 100
+                               Q130 105 112 100 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M82 102
+                               Q130 78 178 102
+                               Q176 150 164 190
+                               Q154 215 154 238
+                               Q154 250 148 262
+                               Q130 270 112 262
+                               Q106 250 106 238
+                               Q106 215 96 190
+                               Q84 150 82 102 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M82 105
+                               Q67 112 58 132
+                               Q50 150 52 180
+                               Q54 207 61 233
+                               Q68 258 70 280
+                               Q71 292 80 292
+                               Q89 292 88 278
+                               Q85 254 80 230
+                               Q76 205 77 180
+                               Q78 150 90 126 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M178 105
+                               Q193 112 202 132
+                               Q210 150 208 180
+                               Q206 207 199 233
+                               Q192 258 190 280
+                               Q189 292 180 292
+                               Q171 292 172 278
+                               Q175 254 180 230
+                               Q184 205 183 180
+                               Q182 150 170 126 Z"
+                            class="body-base"
+                        ></path>
+
+                         <path
+                            d="M108 262
+                               Q97 282 95 302
+                               Q92 326 92 350
+                               Q92 374 89 402
+                               Q86 432 82 470
+                               Q81 484 90 488
+                               Q102 492 106 480
+                               Q112 450 112 420
+                               Q111 384 114 356
+                               Q116 330 118 308
+                               Q120 285 120 270 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M152 262
+                               Q163 282 165 302
+                               Q168 326 168 350
+                               Q168 374 171 402
+                               Q174 432 178 470
+                               Q179 484 170 488
+                               Q158 492 154 480
+                               Q148 450 148 420
+                               Q149 384 146 356
+                               Q144 330 142 308
+                               Q140 285 140 270 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M80 470
+                               Q95 466 108 470
+                               Q110 480 104 491
+                               Q92 498 79 492
+                               Q75 481 80 470 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M152 470
+                               Q165 466 180 470
+                               Q185 481 181 492
+                               Q168 498 156 491
+                               Q150 480 152 470 Z"
+                            class="body-base"
+                        ></path>
+
+                        <!-- FRONT clickable regions -->
+                        <ellipse
+                            class="map-region"
+                            cx="130"
+                            cy="50"
+                            rx="28"
+                            ry="32"
+                            data-location="Front - Head"
+                        >
+                            <title>Front - Head</title>
+                        </ellipse>
+
+                        <path
+                            class="map-region"
+                            d="M112 82 Q130 74 148 82 L148 100 Q130 105 112 100 Z"
+                            data-location="Front - Neck"
+                        >
+                            <title>Front - Neck</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M88 100 Q101 88 114 96 L109 121 Q96 121 84 112 Z"
+                            data-location="Front - Left Shoulder"
+                        >
+                            <title>Front - Left Shoulder</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M172 100 Q159 88 146 96 L151 121 Q164 121 176 112 Z"
+                            data-location="Front - Right Shoulder"
+                        >
+                            <title>Front - Right Shoulder</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M98 102 Q130 88 162 102 Q160 131 153 151 Q130 158 107 151 Q100 131 98 102 Z"
+                            data-location="Front - Chest"
+                        >
+                            <title>Front - Chest</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M104 151 Q130 160 156 151 Q156 188 146 214 Q130 220 114 214 Q104 188 104 151 Z"
+                            data-location="Front - Abdomen"
+                        >
+                            <title>Front - Abdomen</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M108 214 Q130 222 152 214 Q154 241 148 262 Q130 270 112 262 Q106 241 108 214 Z"
+                            data-location="Front - Pelvis / Groin"
+                        >
+                            <title>Front - Pelvis / Groin</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M66 122 Q78 120 90 126 Q84 150 80 179 Q78 196 64 196 Q51 196 52 180 Q53 148 66 122 Z"
+                            data-location="Front - Left Upper Arm"
+                        >
+                            <title>Front - Left Upper Arm</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M194 122 Q182 120 170 126 Q176 150 180 179 Q182 196 196 196 Q209 196 208 180 Q207 148 194 122 Z"
+                            data-location="Front - Right Upper Arm"
+                        >
+                            <title>Front - Right Upper Arm</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M63 196 Q76 196 79 210 Q83 233 88 258 Q90 275 79 278 Q68 280 64 266 Q57 241 54 219 Q51 203 63 196 Z"
+                            data-location="Front - Left Forearm"
+                        >
+                            <title>Front - Left Forearm</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M197 196 Q184 196 181 210 Q177 233 172 258 Q170 275 181 278 Q192 280 196 266 Q203 241 206 219 Q209 203 197 196 Z"
+                            data-location="Front - Right Forearm"
+                        >
+                            <title>Front - Right Forearm</title>
+                        </path>
+
+                        <ellipse
+                            class="map-region"
+                            cx="80"
+                            cy="287"
+                            rx="11"
+                            ry="9"
+                            data-location="Front - Left Hand"
+                        >
+                            <title>Front - Left Hand</title>
+                        </ellipse>
+
+                        <ellipse
+                            class="map-region"
+                            cx="180"
+                            cy="287"
+                            rx="11"
+                            ry="9"
+                            data-location="Front - Right Hand"
+                        >
+                            <title>Front - Right Hand</title>
+                        </ellipse>
+
+                        <path
+                            class="map-region"
+                            d="M108 262 Q97 282 95 302 Q92 322 92 345 Q103 350 114 345 Q116 323 118 305 Q120 285 120 270 Z"
+                            data-location="Front - Left Thigh"
+                        >
+                            <title>Front - Left Thigh</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M152 262 Q163 282 165 302 Q168 322 168 345 Q157 350 146 345 Q144 323 142 305 Q140 285 140 270 Z"
+                            data-location="Front - Right Thigh"
+                        >
+                            <title>Front - Right Thigh</title>
+                        </path>
+
+                        <ellipse
+                            class="map-region"
+                            cx="103"
+                            cy="354"
+                            rx="14"
+                            ry="11"
+                            data-location="Front - Left Knee"
+                        >
+                            <title>Front - Left Knee</title>
+                        </ellipse>
+
+                        <ellipse
+                            class="map-region"
+                            cx="157"
+                            cy="354"
+                            rx="14"
+                            ry="11"
+                            data-location="Front - Right Knee"
+                        >
+                            <title>Front - Right Knee</title>
+                        </ellipse>
+
+                        <path
+                            class="map-region"
+                            d="M92 360 Q103 365 114 360 Q113 384 112 420 Q111 450 106 478 Q98 484 89 480 Q85 442 89 402 Q92 380 92 360 Z"
+                            data-location="Front - Left Lower Leg"
+                        >
+                            <title>Front - Left Lower Leg</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M168 360 Q157 365 146 360 Q147 384 148 420 Q149 450 154 478 Q162 484 171 480 Q175 442 171 402 Q168 380 168 360 Z"
+                            data-location="Front - Right Lower Leg"
+                        >
+                            <title>Front - Right Lower Leg</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M80 470 Q95 466 108 470 Q109 482 104 491 Q92 497 79 492 Q75 481 80 470 Z"
+                            data-location="Front - Left Foot"
+                        >
+                            <title>Front - Left Foot</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M152 470 Q165 466 180 470 Q185 481 181 492 Q168 497 156 491 Q151 482 152 470 Z"
+                            data-location="Front - Right Foot"
+                        >
+                            <title>Front - Right Foot</title>
+                        </path>
+
+                    </svg>
+
+                </div>
+
+
+                <!-- BACK -->
+                <div class="anatomy-card">
+
+                    <h3>Back View</h3>
+
+                    <svg
+                        class="anatomy-svg"
+                        viewBox="0 0 260 560"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <!-- Base silhouette -->
+                        <ellipse cx="130" cy="50" rx="28" ry="32" class="body-base"></ellipse>
+
+                        <path
+                            d="M112 82
+                               Q130 74 148 82
+                               L148 100
+                               Q130 105 112 100 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M82 102
+                               Q130 78 178 102
+                               Q176 150 164 190
+                               Q154 215 154 238
+                               Q154 250 148 262
+                               Q130 270 112 262
+                               Q106 250 106 238
+                               Q106 215 96 190
+                               Q84 150 82 102 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M82 105
+                               Q67 112 58 132
+                               Q50 150 52 180
+                               Q54 207 61 233
+                               Q68 258 70 280
+                               Q71 292 80 292
+                               Q89 292 88 278
+                               Q85 254 80 230
+                               Q76 205 77 180
+                               Q78 150 90 126 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M178 105
+                               Q193 112 202 132
+                               Q210 150 208 180
+                               Q206 207 199 233
+                               Q192 258 190 280
+                               Q189 292 180 292
+                               Q171 292 172 278
+                               Q175 254 180 230
+                               Q184 205 183 180
+                               Q182 150 170 126 Z"
+                            class="body-base"
+                        ></path>
+
+
+                        <path
+                            d="M108 262
+                               Q97 282 95 302
+                               Q92 326 92 350
+                               Q92 374 89 402
+                               Q86 432 82 470
+                               Q81 484 90 488
+                               Q102 492 106 480
+                               Q112 450 112 420
+                               Q111 384 114 356
+                               Q116 330 118 308
+                               Q120 285 120 270 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M152 262
+                               Q163 282 165 302
+                               Q168 326 168 350
+                               Q168 374 171 402
+                               Q174 432 178 470
+                               Q179 484 170 488
+                               Q158 492 154 480
+                               Q148 450 148 420
+                               Q149 384 146 356
+                               Q144 330 142 308
+                               Q140 285 140 270 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M80 470
+                               Q95 466 108 470
+                               Q110 480 104 491
+                               Q92 498 79 492
+                               Q75 481 80 470 Z"
+                            class="body-base"
+                        ></path>
+
+                        <path
+                            d="M152 470
+                               Q165 466 180 470
+                               Q185 481 181 492
+                               Q168 498 156 491
+                               Q150 480 152 470 Z"
+                            class="body-base"
+                        ></path>
+
+                        <!-- BACK clickable regions -->
+                        <ellipse
+                            class="map-region"
+                            cx="130"
+                            cy="50"
+                            rx="28"
+                            ry="32"
+                            data-location="Back - Head"
+                        >
+                            <title>Back - Head</title>
+                        </ellipse>
+
+                        <path
+                            class="map-region"
+                            d="M112 82 Q130 74 148 82 L148 100 Q130 105 112 100 Z"
+                            data-location="Back - Neck"
+                        >
+                            <title>Back - Neck</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M88 100 Q101 88 114 96 L109 121 Q96 121 84 112 Z"
+                            data-location="Back - Left Shoulder"
+                        >
+                            <title>Back - Left Shoulder</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M172 100 Q159 88 146 96 L151 121 Q164 121 176 112 Z"
+                            data-location="Back - Right Shoulder"
+                        >
+                            <title>Back - Right Shoulder</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M98 102 Q130 88 162 102 Q160 128 154 145 Q130 152 106 145 Q100 128 98 102 Z"
+                            data-location="Back - Upper Back"
+                        >
+                            <title>Back - Upper Back</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M103 145 Q130 153 157 145 Q156 177 148 196 Q130 202 112 196 Q104 177 103 145 Z"
+                            data-location="Back - Mid Back"
+                        >
+                            <title>Back - Mid Back</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M108 196 Q130 202 152 196 Q154 220 148 238 Q130 244 112 238 Q106 220 108 196 Z"
+                            data-location="Back - Lower Back"
+                        >
+                            <title>Back - Lower Back</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M108 238 Q130 246 152 238 Q154 252 148 262 Q130 270 112 262 Q106 252 108 238 Z"
+                            data-location="Back - Buttocks / Sacral Area"
+                        >
+                            <title>Back - Buttocks / Sacral Area</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M66 122 Q78 120 90 126 Q84 150 80 179 Q78 196 64 196 Q51 196 52 180 Q53 148 66 122 Z"
+                            data-location="Back - Left Upper Arm"
+                        >
+                            <title>Back - Left Upper Arm</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M194 122 Q182 120 170 126 Q176 150 180 179 Q182 196 196 196 Q209 196 208 180 Q207 148 194 122 Z"
+                            data-location="Back - Right Upper Arm"
+                        >
+                            <title>Back - Right Upper Arm</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M63 196 Q76 196 79 210 Q83 233 88 258 Q90 275 79 278 Q68 280 64 266 Q57 241 54 219 Q51 203 63 196 Z"
+                            data-location="Back - Left Forearm"
+                        >
+                            <title>Back - Left Forearm</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M197 196 Q184 196 181 210 Q177 233 172 258 Q170 275 181 278 Q192 280 196 266 Q203 241 206 219 Q209 203 197 196 Z"
+                            data-location="Back - Right Forearm"
+                        >
+                            <title>Back - Right Forearm</title>
+                        </path>
+
+                        <ellipse
+                            class="map-region"
+                            cx="80"
+                            cy="287"
+                            rx="11"
+                            ry="9"
+                            data-location="Back - Left Hand"
+                        >
+                            <title>Back - Left Hand</title>
+                        </ellipse>
+
+                        <ellipse
+                            class="map-region"
+                            cx="180"
+                            cy="287"
+                            rx="11"
+                            ry="9"
+                            data-location="Back - Right Hand"
+                        >
+                            <title>Back - Right Hand</title>
+                        </ellipse>
+
+                        <path
+                            class="map-region"
+                            d="M108 262 Q97 282 95 302 Q92 322 92 345 Q103 350 114 345 Q116 323 118 305 Q120 285 120 270 Z"
+                            data-location="Back - Left Thigh"
+                        >
+                            <title>Back - Left Thigh</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M152 262 Q163 282 165 302 Q168 322 168 345 Q157 350 146 345 Q144 323 142 305 Q140 285 140 270 Z"
+                            data-location="Back - Right Thigh"
+                        >
+                            <title>Back - Right Thigh</title>
+                        </path>
+
+                        <ellipse
+                            class="map-region"
+                            cx="103"
+                            cy="354"
+                            rx="14"
+                            ry="11"
+                            data-location="Back - Left Knee"
+                        >
+                            <title>Back - Left Knee</title>
+                        </ellipse>
+
+                        <ellipse
+                            class="map-region"
+                            cx="157"
+                            cy="354"
+                            rx="14"
+                            ry="11"
+                            data-location="Back - Right Knee"
+                        >
+                            <title>Back - Right Knee</title>
+                        </ellipse>
+
+                        <path
+                            class="map-region"
+                            d="M92 360 Q103 365 114 360 Q113 384 112 420 Q111 450 106 478 Q98 484 89 480 Q85 442 89 402 Q92 380 92 360 Z"
+                            data-location="Back - Left Calf / Lower Leg"
+                        >
+                            <title>Back - Left Calf / Lower Leg</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M168 360 Q157 365 146 360 Q147 384 148 420 Q149 450 154 478 Q162 484 171 480 Q175 442 171 402 Q168 380 168 360 Z"
+                            data-location="Back - Right Calf / Lower Leg"
+                        >
+                            <title>Back - Right Calf / Lower Leg</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M80 470 Q95 466 108 470 Q109 482 104 491 Q92 497 79 492 Q75 481 80 470 Z"
+                            data-location="Back - Left Heel / Foot"
+                        >
+                            <title>Back - Left Heel / Foot</title>
+                        </path>
+
+                        <path
+                            class="map-region"
+                            d="M152 470 Q165 466 180 470 Q185 481 181 492 Q168 497 156 491 Q151 482 152 470 Z"
+                            data-location="Back - Right Heel / Foot"
+                        >
+                            <title>Back - Right Heel / Foot</title>
+                        </path>
+
+                    </svg>
+
+                </div>
+
+            </div>
+
+            <p class="body-map-help">
+                Select a region from the body map, or enter the wound location manually above.
+            </p>
+
+        </div>
+
+
+        <div class="region-name-list">
+
+            <h4>Available Region Names</h4>
+
+            <div class="region-chip-grid">
+
+                <span class="region-chip">Head</span>
+                <span class="region-chip">Neck</span>
+                <span class="region-chip">Shoulder</span>
+                <span class="region-chip">Chest</span>
+                <span class="region-chip">Abdomen</span>
+                <span class="region-chip">Pelvis / Groin</span>
+                <span class="region-chip">Upper Back</span>
+                <span class="region-chip">Mid Back</span>
+                <span class="region-chip">Lower Back</span>
+                <span class="region-chip">Sacral / Buttocks</span>
+                <span class="region-chip">Upper Arm</span>
+                <span class="region-chip">Forearm</span>
+                <span class="region-chip">Hand</span>
+                <span class="region-chip">Thigh</span>
+                <span class="region-chip">Knee</span>
+                <span class="region-chip">Lower Leg / Calf</span>
+                <span class="region-chip">Foot / Heel</span>
+
+            </div>
 
         </div>
 
@@ -128,5 +806,74 @@ Add Wound - WoundCare
     </form>
 
 </div>
+
+
+<script>
+
+    const regions = document.querySelectorAll(".map-region");
+    const locationInput = document.getElementById("location");
+    const specificLocationInput = document.getElementById("specific_location");
+    const selectedAreaLabel = document.getElementById("selected-area-label");
+
+    function updateLocationField() {
+
+        const selectedRegion = document.querySelector(".map-region.selected");
+
+        if (!selectedRegion) {
+            selectedAreaLabel.textContent = "Manual location";
+            return;
+        }
+        const baseLocation = selectedRegion.dataset.location;
+        const specificLocation = specificLocationInput.value.trim();
+
+        selectedAreaLabel.textContent = baseLocation;
+
+        if (specificLocation) {
+            locationInput.value = baseLocation + " - " + specificLocation;
+        } else {
+            locationInput.value = baseLocation;
+        }
+
+    }
+
+    regions.forEach(function(region) {
+
+        region.addEventListener("click", function() {
+
+            regions.forEach(function(item) {
+                item.classList.remove("selected");
+            });
+
+            this.classList.add("selected");
+            updateLocationField();
+
+        });
+
+    });
+
+    locationInput.addEventListener("input", function() {
+
+    const selectedRegion =
+        document.querySelector(".map-region.selected");
+
+    if (!selectedRegion) {
+
+        if (locationInput.value.trim()) {
+            selectedAreaLabel.textContent =
+                "Manual: " + locationInput.value.trim();
+        } else {
+            selectedAreaLabel.textContent =
+                "No area selected";
+        }
+
+    }
+
+});
+
+    specificLocationInput.addEventListener("input", function() {
+        updateLocationField();
+    });
+
+</script>
 
 {% endblock %}

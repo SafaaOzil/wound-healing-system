@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}
+Compare Visits - WoundCare
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <h1>Compare Visits</h1>
+
+    <p>
+        Patient: {{ wound.patient.full_name }}
+        |
+        Wound: {{ wound.location }}
+    </p>
+
+</section>
+
+
+<div class="form-container">
+
+    <form method="GET">
+
+        <div class="compare-select-grid">
+
+            <div class="form-group">
+
+                <label>
+                    First Visit
+                </label>
+
+                <select name="first_visit" required>
+
+                    <option value="">
+                        Select visit
+                    </option>
+
+                    {% for visit in visits %}
+
+                        <option
+                            value="{{ visit.id }}"
+                            {% if first_visit and first_visit.id == visit.id %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ visit.visit_date.strftime("%d/%m/%Y") }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Second Visit
+                </label>
+
+                <select name="second_visit" required>
+
+                    <option value="">
+                        Select visit
+                    </option>
+
+                    {% for visit in visits %}
+
+                        <option
+                            value="{{ visit.id }}"
+                            {% if second_visit and second_visit.id == visit.id %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ visit.visit_date.strftime("%d/%m/%Y") }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('patient_details', patient_db_id=wound.patient.id) }}"
+                class="secondary-button"
+            >
+                Back
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Compare
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+{% if first_visit and second_visit %}
+
+    <div class="comparison-summary">
+
+        <h2>Comparison Result</h2>
+
+        {% if comparison %}
+
+            <p>
+                <strong>Status:</strong>
+                {{ comparison.status }}
+            </p>
+
+            <p>
+                <strong>Area Change:</strong>
+
+                {% if comparison.area_change > 0 %}
+
+                    {{ comparison.area_change }}% reduction
+
+                {% elif comparison.area_change < 0 %}
+
+                    {{ comparison.area_change|abs }}% increase
+
+                {% else %}
+
+                    No change
+
+                {% endif %}
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="comparison-grid">
+
+        <div class="comparison-card">
+
+            <h3>
+                {{ first_visit.visit_date.strftime("%d/%m/%Y") }}
+            </h3>
+
+            {% if first_visit.image_path %}
+
+                <img
+                    src="{{ url_for('static', filename=first_visit.image_path) }}"
+                    alt="First wound visit"
+                    class="compare-image"
+                >
+
+            {% endif %}
+
+            <p>
+                <strong>Length:</strong>
+                {{ first_visit.length_cm }} cm
+            </p>
+
+            <p>
+                <strong>Width:</strong>
+                {{ first_visit.width_cm }} cm
+            </p>
+
+            <p>
+                <strong>Depth:</strong>
+
+                {% if first_visit.depth_cm is not none %}
+                    {{ first_visit.depth_cm }} cm
+                {% else %}
+                    -
+                {% endif %}
+            </p>
+
+            <p>
+                <strong>Area:</strong>
+                {{ first_visit.area }} cm²
+            </p>
+
+            <p>
+                <strong>Pain:</strong>
+
+                {% if first_visit.pain_level is not none %}
+                    {{ first_visit.pain_level }}/10
+                {% else %}
+                    -
+                {% endif %}
+            </p>
+
+            <p>
+                <strong>Condition:</strong>
+                {{ first_visit.wound_condition or "-" }}
+            </p>
+
+        </div>
+
+
+        <div class="comparison-card">
+
+            <h3>
+                {{ second_visit.visit_date.strftime("%d/%m/%Y") }}
+            </h3>
+
+            {% if second_visit.image_path %}
+
+                <img
+                    src="{{ url_for('static', filename=second_visit.image_path) }}"
+                    alt="Second wound visit"
+                    class="compare-image"
+                >
+
+            {% endif %}
+
+            <p>
+                <strong>Length:</strong>
+                {{ second_visit.length_cm }} cm
+            </p>
+
+            <p>
+                <strong>Width:</strong>
+                {{ second_visit.width_cm }} cm
+            </p>
+
+            <p>
+                <strong>Depth:</strong>
+
+                {% if second_visit.depth_cm is not none %}
+                    {{ second_visit.depth_cm }} cm
+                {% else %}
+                    -
+                {% endif %}
+            </p>
+
+            <p>
+                <strong>Area:</strong>
+                {{ second_visit.area }} cm²
+            </p>
+
+            <p>
+                <strong>Pain:</strong>
+
+                {% if second_visit.pain_level is not none %}
+                    {{ second_visit.pain_level }}/10
+                {% else %}
+                    -
+                {% endif %}
+            </p>
+
+            <p>
+                <strong>Condition:</strong>
+                {{ second_visit.wound_condition or "-" }}
+            </p>
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

@@ -24,18 +24,63 @@ db.init_app(app)
 
 @app.route("/")
 def dashboard():
+
     total_patients = Patient.query.count()
     total_wounds = Wound.query.count()
     total_visits = Visit.query.count()
 
-    active_wounds = Wound.query.filter_by(status="ACTIVE").count()
+    active_wounds = Wound.query.filter_by(
+        status="ACTIVE"
+    ).count()
+
+    improving_wounds = 0
+    stable_wounds = 0
+    needs_attention_wounds = 0
+
+    wounds = Wound.query.all()
+
+    for wound in wounds:
+
+        visits = sorted(
+            wound.visits,
+            key=lambda v: v.visit_date
+        )
+
+        if len(visits) < 2:
+            continue
+
+        previous_visit = visits[-2]
+        latest_visit = visits[-1]
+
+        if previous_visit.area <= 0:
+            continue
+
+        change_percent = (
+            (previous_visit.area - latest_visit.area)
+            / previous_visit.area
+        ) * 100
+
+        if change_percent > 5:
+
+            improving_wounds += 1
+
+        elif change_percent < -5:
+
+            needs_attention_wounds += 1
+
+        else:
+
+            stable_wounds += 1
 
     return render_template(
         "dashboard.html",
         total_patients=total_patients,
         total_wounds=total_wounds,
         total_visits=total_visits,
-        active_wounds=active_wounds
+        active_wounds=active_wounds,
+        improving_wounds=improving_wounds,
+        stable_wounds=stable_wounds,
+        needs_attention_wounds=needs_attention_wounds
     )
 
 
@@ -98,13 +143,13 @@ def add_patient():
 
     return render_template("add_patient.html")
 
-
 @app.route("/patients/<int:patient_db_id>")
 def patient_details(patient_db_id):
 
     patient = Patient.query.get_or_404(patient_db_id)
 
     wound_progress = {}
+    wound_alerts = {}
 
     for wound in patient.wounds:
 
@@ -151,10 +196,28 @@ def patient_details(patient_db_id):
 
         wound_progress[wound.id] = progress_data
 
+        no_progress_alert = False
+
+        if len(progress_data) >= 3:
+
+            last_changes = [
+                item["change_percent"]
+                for item in progress_data[-2:]
+                if item["change_percent"] is not None
+            ]
+
+            if len(last_changes) == 2:
+
+                if all(abs(change) <= 5 for change in last_changes):
+                    no_progress_alert = True
+
+        wound_alerts[wound.id] = no_progress_alert
+
     return render_template(
         "patient_details.html",
         patient=patient,
-        wound_progress=wound_progress
+        wound_progress=wound_progress,
+        wound_alerts=wound_alerts
     )
 
 
@@ -304,7 +367,70 @@ def add_visit(wound_id):
 
 
 
+@app.route("/wounds/<int:wound_id>/compare")
+def compare_visits(wound_id):
 
+    wound = Wound.query.get_or_404(wound_id)
+
+    visits = sorted(
+        wound.visits,
+        key=lambda v: v.visit_date
+    )
+
+    first_visit_id = request.args.get("first_visit", type=int)
+    second_visit_id = request.args.get("second_visit", type=int)
+
+    first_visit = None
+    second_visit = None
+    comparison = None
+
+    if first_visit_id and second_visit_id:
+
+        first_visit = Visit.query.filter_by(
+            id=first_visit_id,
+            wound_id=wound.id
+        ).first_or_404()
+
+        second_visit = Visit.query.filter_by(
+            id=second_visit_id,
+            wound_id=wound.id
+        ).first_or_404()
+
+        area_change = None
+        status = None
+
+        if first_visit.area > 0:
+
+            area_change = round(
+                (
+                    (first_visit.area - second_visit.area)
+                    / first_visit.area
+                ) * 100,
+                2
+            )
+
+            if area_change > 5:
+                status = "Improved"
+
+            elif area_change < -5:
+                status = "Worsened"
+
+            else:
+                status = "Stable"
+
+        comparison = {
+            "area_change": area_change,
+            "status": status
+        }
+
+    return render_template(
+        "compare_visits.html",
+        wound=wound,
+        visits=visits,
+        first_visit=first_visit,
+        second_visit=second_visit,
+        comparison=comparison
+    )
 
 
 

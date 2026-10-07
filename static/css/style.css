@@ -288,3 +288,301 @@ body {
 .chart-container canvas {
     max-height: 350px;
 }
+
+
+
+
+.compare-select-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.comparison-summary {
+    background-color: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 25px;
+    margin-top: 25px;
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin-top: 25px;
+}
+
+.comparison-card {
+    background-color: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.comparison-card h3 {
+    margin-top: 0;
+}
+
+.compare-image {
+    width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 1px solid #dddddd;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 800px) {
+
+    .compare-select-grid,
+    .comparison-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+.warning-alert {
+    background-color: #fff4e5;
+    border: 1px solid #f0b35a;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.warning-alert strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.warning-alert p {
+    margin: 0;
+}
+
+
+.dashboard-section {
+    margin-top: 40px;
+}
+
+.dashboard-section h2 {
+    margin-bottom: 20px;
+}
+
+.healing-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.status-card {
+    position: relative;
+}
+
+.improving-card {
+    border-left: 5px solid #4caf50;
+}
+
+.stable-card {
+    border-left: 5px solid #f0ad4e;
+}
+
+.attention-card {
+    border-left: 5px solid #d9534f;
+}
+
+.status-card p:last-child {
+    color: #666666;
+    margin-bottom: 0;
+}
+
+@media (max-width: 800px) {
+
+    .healing-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+.body-map-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.body-map {
+    width: 320px;
+    text-align: center;
+}
+
+.body-part {
+    background-color: #f4f7fa;
+    border: 2px solid #d5dbe1;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+    user-select: none;
+}
+
+.body-part:hover {
+    background-color: #e8edf2;
+    border-color: #999999;
+}
+
+.body-part.selected {
+    background-color: #dceeff;
+    border-color: #3978b7;
+    font-weight: bold;
+}
+
+.head {
+    width: 90px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+}
+
+.chest {
+    width: 170px;
+    margin: auto;
+}
+
+.abdomen {
+    width: 150px;
+    margin: 10px auto;
+}
+
+.arms-row,
+.legs-row,
+.feet-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.arm {
+    width: 115px;
+}
+
+.leg {
+    width: 110px;
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.foot {
+    width: 110px;
+}
+
+.body-map-help {
+    text-align: center;
+    color: #666666;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+
+.anatomy-map-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin-top: 15px;
+}
+
+.anatomy-card {
+    background-color: #f8f9fb;
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+}
+
+.anatomy-card h3 {
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+.anatomy-svg {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+}
+
+.body-base {
+    fill: #edf2f7;
+    stroke: #c9d3de;
+    stroke-width: 2;
+}
+
+.map-region {
+    fill: rgba(57, 120, 183, 0);
+    stroke: transparent;
+    stroke-width: 2;
+    cursor: pointer;
+    transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.map-region:hover {
+    fill: rgba(57, 120, 183, 0.22);
+    stroke: #3978b7;
+}
+
+.map-region.selected {
+    fill: rgba(57, 120, 183, 0.38);
+    stroke: #245a8d;
+}
+
+.selected-region-box {
+    background-color: #f4f8fc;
+    border: 1px solid #d6e2ef;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+}
+
+.selected-region-box strong {
+    margin-right: 8px;
+}
+
+.body-map-help {
+    text-align: center;
+    color: #666666;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.region-name-list {
+    margin-top: 25px;
+    background-color: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.region-name-list h4 {
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+.region-chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.region-chip {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #f4f7fa;
+    border: 1px solid #d8dee6;
+    border-radius: 999px;
+    font-size: 14px;
+}
+
+@media (max-width: 900px) {
+    .anatomy-map-grid {
+        grid-template-columns: 1fr;
+    }
+}

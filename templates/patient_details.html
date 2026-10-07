@@ -93,7 +93,20 @@ Patient Details - WoundCare
                         <strong>Visits:</strong>
                         {{ wound.visits|length }}
                     </p>
+{% if wound_alerts[wound.id] %}
 
+    <div class="warning-alert">
+
+        <strong>No Progress Alert</strong>
+
+        <p>
+            No significant improvement was detected
+            during the last visits.
+        </p>
+
+    </div>
+
+{% endif %}
                 </div>
 
 
@@ -105,6 +118,13 @@ Patient Details - WoundCare
                     >
                         + Add Visit
                     </a>
+<a
+    href="{{ url_for('compare_visits', wound_id=wound.id) }}"
+    class="secondary-button"
+>
+    Compare Visits
+</a>
+
 
                 </div>
 
