@@ -658,3 +658,255 @@ body {
     color: #666666;
     font-size: 14px;
 }
+
+
+.flash-container {
+    margin-bottom: 20px;
+}
+
+.flash-message {
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.flash-success {
+    background-color: #eaf7ed;
+    border: 1px solid #9bcfa5;
+    color: #256b34;
+}
+
+.flash-error {
+    background-color: #fdecec;
+    border: 1px solid #e4a3a3;
+    color: #9d2020;
+}
+
+.flash-warning {
+    background-color: #fff5df;
+    border: 1px solid #e8c879;
+    color: #7a5a0a;
+}
+
+
+
+.visit-actions {
+    margin-top: 15px;
+}
+
+
+
+
+
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.report-card {
+    background-color: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.report-card h3 {
+    margin-top: 0;
+}
+
+.report-card p {
+    color: #666666;
+}
+
+@media (max-width: 800px) {
+
+    .reports-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+
+.reports-main-section {
+    margin-bottom: 40px;
+}
+
+.reports-section-header {
+    margin-bottom: 18px;
+}
+
+.reports-section-header h2 {
+    margin-bottom: 5px;
+}
+
+.reports-section-header p {
+    margin-top: 0;
+    color: #666666;
+}
+
+.report-search-card,
+.audit-filter-card {
+    background-color: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 25px;
+}
+
+.report-search-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+}
+
+.report-search-input {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.report-search-button {
+    padding-bottom: 1px;
+}
+
+.report-patient-card {
+    background-color: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.report-patient-header {
+    border-bottom: 1px solid #eeeeee;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.report-patient-header h2 {
+    margin-top: 0;
+}
+
+.report-actions {
+    margin-bottom: 30px;
+}
+
+.report-button-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.patient-wounds-section {
+    margin-top: 25px;
+}
+
+.report-wound-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 25px;
+
+    background-color: #f8f9fb;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+
+    padding: 20px;
+    margin-top: 15px;
+}
+
+.report-wound-info h4 {
+    margin-top: 0;
+}
+
+.report-wound-info p {
+    margin: 5px 0;
+}
+
+.report-wound-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.audit-report-section {
+    border-top: 1px solid #dddddd;
+    padding-top: 35px;
+}
+
+.audit-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px 20px;
+}
+
+.audit-filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.audit-results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 25px 0 15px;
+}
+
+.audit-results-header h3 {
+    margin: 0;
+}
+
+.audit-result-count {
+    color: #666666;
+    font-size: 14px;
+}
+
+.audit-table-container {
+    overflow-x: auto;
+}
+
+.audit-action {
+    font-weight: bold;
+}
+
+.empty-table-cell {
+    text-align: center !important;
+    color: #666666;
+    padding: 30px !important;
+}
+
+@media (max-width: 900px) {
+
+    .audit-filter-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .report-wound-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .audit-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-search-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+}
+
+
+.audit-export-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+}

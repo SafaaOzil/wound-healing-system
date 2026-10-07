@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Wound - WoundCare
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <h1>Edit Wound</h1>
+
+    <p>
+        Patient: {{ wound.patient.full_name }}
+    </p>
+
+</section>
+
+
+<div class="form-container">
+
+    <form method="POST">
+
+        <div class="form-group">
+
+            <label>
+                Wound Location
+            </label>
+
+            <input
+                type="text"
+                name="location"
+                value="{{ wound.location }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Wound Type
+            </label>
+
+            <select name="wound_type">
+
+                <option value="">
+                    Select wound type
+                </option>
+
+                <option
+                    value="Pressure Injury"
+                    {% if wound.wound_type == "Pressure Injury" %}selected{% endif %}
+                >
+                    Pressure Injury
+                </option>
+
+                <option
+                    value="Diabetic Ulcer"
+                    {% if wound.wound_type == "Diabetic Ulcer" %}selected{% endif %}
+                >
+                    Diabetic Ulcer
+                </option>
+
+                <option
+                    value="Venous Ulcer"
+                    {% if wound.wound_type == "Venous Ulcer" %}selected{% endif %}
+                >
+                    Venous Ulcer
+                </option>
+
+                <option
+                    value="Arterial Ulcer"
+                    {% if wound.wound_type == "Arterial Ulcer" %}selected{% endif %}
+                >
+                    Arterial Ulcer
+                </option>
+
+                <option
+                    value="Surgical Wound"
+                    {% if wound.wound_type == "Surgical Wound" %}selected{% endif %}
+                >
+                    Surgical Wound
+                </option>
+
+                <option
+                    value="Traumatic Wound"
+                    {% if wound.wound_type == "Traumatic Wound" %}selected{% endif %}
+                >
+                    Traumatic Wound
+                </option>
+
+                <option
+                    value="Other"
+                    {% if wound.wound_type == "Other" %}selected{% endif %}
+                >
+                    Other
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Status
+            </label>
+
+            {% if g.user.role in ["ADMIN", "DOCTOR"] %}
+
+                <select
+                    name="status"
+                    required
+                >
+
+                    <option
+                        value="ACTIVE"
+                        {% if wound.status == "ACTIVE" %}selected{% endif %}
+                    >
+                        Active
+                    </option>
+
+                    <option
+                        value="HEALED"
+                        {% if wound.status == "HEALED" %}selected{% endif %}
+                    >
+                        Healed
+                    </option>
+
+                    <option
+                        value="CLOSED"
+                        {% if wound.status == "CLOSED" %}selected{% endif %}
+                    >
+                        Closed
+                    </option>
+
+                </select>
+
+            {% else %}
+
+                {% if wound.status == "ACTIVE" %}
+
+                    <select
+                        name="status"
+                        required
+                    >
+
+                        <option
+                            value="ACTIVE"
+                            selected
+                        >
+                            Active
+                        </option>
+
+                    </select>
+
+                    <small>
+                        Only a Doctor or Admin can mark a wound as Healed or Closed.
+                    </small>
+
+                {% else %}
+
+                    <input
+                        type="text"
+                        value="{{ wound.status }}"
+                        disabled
+                    >
+
+                    <input
+                        type="hidden"
+                        name="status"
+                        value="{{ wound.status }}"
+                    >
+
+                    <small>
+                        Only a Doctor or Admin can change this wound status.
+                    </small>
+
+                {% endif %}
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('patient_details', patient_db_id=wound.patient.id) }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Save Changes
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

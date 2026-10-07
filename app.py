@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 import os
@@ -41,14 +41,19 @@ import os
 from werkzeug.utils import secure_filename
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///wound_system.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = "dev-secret-key"
-
+app.config["SECRET_KEY"] = os.getenv(
+    "SECRET_KEY",
+    "development-secret-key"
+)
 app.config["UPLOAD_FOLDER"] = "static/uploads"
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
@@ -417,9 +422,9 @@ def patients():
     )
 
 
+
 @app.route("/patients/add", methods=["GET", "POST"])
 @login_required
-
 def add_patient():
 
     if request.method == "POST":
@@ -429,29 +434,62 @@ def add_patient():
         birth_date = request.form.get("birth_date", "").strip()
 
         if not patient_id or not full_name:
-            flash("Patient ID and full name are required.", "error")
-            return redirect(url_for("add_patient"))
+            flash(
+                "Patient ID and full name are required.",
+                "error"
+            )
+
+            return redirect(
+                url_for("add_patient")
+            )
 
         existing_patient = Patient.query.filter_by(
             patient_id=patient_id
         ).first()
 
         if existing_patient:
-            flash("A patient with this ID already exists.", "error")
-            return redirect(url_for("add_patient"))
+
+            flash(
+                "A patient with this ID already exists.",
+                "error"
+            )
+
+            return redirect(
+                url_for("add_patient")
+            )
 
         parsed_birth_date = None
 
         if birth_date:
+
             try:
+
                 parsed_birth_date = datetime.strptime(
                     birth_date,
                     "%Y-%m-%d"
                 ).date()
 
+                if parsed_birth_date > datetime.today().date():
+
+                    flash(
+                        "Birth date cannot be in the future.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for("add_patient")
+                    )
+
             except ValueError:
-                flash("Invalid birth date.", "error")
-                return redirect(url_for("add_patient"))
+
+                flash(
+                    "Invalid birth date.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("add_patient")
+                )
 
         new_patient = Patient(
             patient_id=patient_id,
@@ -466,15 +504,31 @@ def add_patient():
             action="CREATE",
             record_type="PATIENT",
             record_id=new_patient.id,
-            details=f"Created patient: {new_patient.full_name}"
+            details=(
+                f"Created patient: "
+                f"{new_patient.full_name}"
+            )
         )
 
         db.session.commit()
-        flash("Patient added successfully.", "success")
 
-        return redirect(url_for("patients"))
+        flash(
+            "Patient added successfully.",
+            "success"
+        )
 
-    return render_template("add_patient.html")
+        return redirect(
+            url_for("patients")
+        )
+
+    return render_template(
+        "add_patient.html"
+    )
+
+
+
+
+
 
 @app.route("/patients/<int:patient_db_id>")
 def patient_details(patient_db_id):
@@ -612,59 +666,193 @@ def add_wound(patient_db_id):
         patient=patient
     )
 
-
-
-
-
 @app.route("/wounds/<int:wound_id>/visits/add", methods=["GET", "POST"])
 @login_required
-
 def add_visit(wound_id):
 
     wound = Wound.query.get_or_404(wound_id)
 
     if request.method == "POST":
 
-        visit_date = request.form.get("visit_date")
-        length_cm = request.form.get("length_cm")
-        width_cm = request.form.get("width_cm")
-        depth_cm = request.form.get("depth_cm")
-        pain_level = request.form.get("pain_level")
-        wound_condition = request.form.get("wound_condition")
-        notes = request.form.get("notes")
+        visit_date = request.form.get("visit_date", "").strip()
+        length_cm = request.form.get("length_cm", "").strip()
+        width_cm = request.form.get("width_cm", "").strip()
+        depth_cm = request.form.get("depth_cm", "").strip()
+        pain_level = request.form.get("pain_level", "").strip()
+        wound_condition = request.form.get("wound_condition", "").strip()
+        notes = request.form.get("notes", "").strip()
 
+        # Required fields
         if not visit_date or not length_cm or not width_cm:
-            flash("Visit date, length and width are required.", "error")
+
+            flash(
+                "Visit date, length and width are required.",
+                "error"
+            )
+
             return redirect(
-                url_for("add_visit", wound_id=wound.id)
+                url_for(
+                    "add_visit",
+                    wound_id=wound.id
+                )
             )
 
         try:
+
+            # -------------------------
+            # Visit Date
+            # -------------------------
+
             parsed_date = datetime.strptime(
                 visit_date,
                 "%Y-%m-%d"
             ).date()
 
-            length_cm = float(length_cm)
-            width_cm = float(width_cm)
+            if parsed_date > datetime.today().date():
 
-            depth_cm = (
-                float(depth_cm)
-                if depth_cm
-                else None
-            )
+                flash(
+                    "Visit date cannot be in the future.",
+                    "error"
+                )
 
-            pain_level = (
-                int(pain_level)
-                if pain_level
-                else None
-            )
+                return redirect(
+                    url_for(
+                        "add_visit",
+                        wound_id=wound.id
+                    )
+                )
+
+            # -------------------------
+            # Length
+            # -------------------------
+
+            length_value = float(length_cm)
+
+            if length_value <= 0:
+
+                flash(
+                    "Length must be greater than zero.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "add_visit",
+                        wound_id=wound.id
+                    )
+                )
+
+            # -------------------------
+            # Width
+            # -------------------------
+
+            width_value = float(width_cm)
+
+            if width_value <= 0:
+
+                flash(
+                    "Width must be greater than zero.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "add_visit",
+                        wound_id=wound.id
+                    )
+                )
+
+            # -------------------------
+            # Depth
+            # -------------------------
+
+            depth_value = None
+
+            if depth_cm:
+
+                depth_value = float(depth_cm)
+
+                if depth_value < 0:
+
+                    flash(
+                        "Depth cannot be negative.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for(
+                            "add_visit",
+                            wound_id=wound.id
+                        )
+                    )
+
+            # -------------------------
+            # Pain Level
+            # -------------------------
+
+            pain_value = None
+
+            if pain_level:
+
+                pain_value = int(pain_level)
+
+                if pain_value < 0 or pain_value > 10:
+
+                    flash(
+                        "Pain level must be between 0 and 10.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for(
+                            "add_visit",
+                            wound_id=wound.id
+                        )
+                    )
 
         except ValueError:
-            flash("Invalid visit data.", "error")
-            return redirect(
-                url_for("add_visit", wound_id=wound.id)
+
+            flash(
+                "Invalid visit data. Please enter valid numeric values.",
+                "error"
             )
+
+            return redirect(
+                url_for(
+                    "add_visit",
+                    wound_id=wound.id
+                )
+            )
+
+        # -------------------------
+        # Wound Condition
+        # -------------------------
+
+        allowed_conditions = [
+            "",
+            "Improving",
+            "Stable",
+            "Worsening",
+            "Infected"
+        ]
+
+        if wound_condition not in allowed_conditions:
+
+            flash(
+                "Invalid wound condition.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "add_visit",
+                    wound_id=wound.id
+                )
+            )
+
+        # -------------------------
+        # Image Upload
+        # -------------------------
 
         image_path = None
 
@@ -672,33 +860,102 @@ def add_visit(wound_id):
 
         if image and image.filename:
 
-            filename = secure_filename(image.filename)
+            allowed_extensions = {
+                "png",
+                "jpg",
+                "jpeg",
+                "webp"
+            }
 
-            filename = f"{wound.id}_{datetime.now().timestamp()}_{filename}"
+            filename = secure_filename(
+                image.filename
+            )
+
+            if "." not in filename:
+
+                flash(
+                    "Invalid image file.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "add_visit",
+                        wound_id=wound.id
+                    )
+                )
+
+            extension = filename.rsplit(
+                ".",
+                1
+            )[1].lower()
+
+            if extension not in allowed_extensions:
+
+                flash(
+                    "Image must be PNG, JPG, JPEG or WEBP.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "add_visit",
+                        wound_id=wound.id
+                    )
+                )
+
+            filename = (
+                f"{wound.id}_"
+                f"{datetime.now().timestamp()}_"
+                f"{filename}"
+            )
 
             save_path = os.path.join(
                 app.config["UPLOAD_FOLDER"],
                 filename
             )
 
-            image.save(save_path)
+            image.save(
+                save_path
+            )
 
-            image_path = f"uploads/{filename}"
+            image_path = (
+                f"uploads/{filename}"
+            )
+
+        # -------------------------
+        # Create Visit
+        # -------------------------
 
         new_visit = Visit(
             wound_id=wound.id,
             visit_date=parsed_date,
-            length_cm=length_cm,
-            width_cm=width_cm,
-            depth_cm=depth_cm,
-            pain_level=pain_level,
-            wound_condition=wound_condition,
-            notes=notes,
+            length_cm=length_value,
+            width_cm=width_value,
+            depth_cm=depth_value,
+            pain_level=pain_value,
+            wound_condition=(
+                wound_condition
+                if wound_condition
+                else None
+            ),
+            notes=(
+                notes
+                if notes
+                else None
+            ),
             image_path=image_path
         )
 
-        db.session.add(new_visit)
+        db.session.add(
+            new_visit
+        )
+
         db.session.flush()
+
+        # -------------------------
+        # Audit Trail
+        # -------------------------
 
         create_audit_log(
             action="CREATE",
@@ -706,14 +963,25 @@ def add_visit(wound_id):
             record_id=new_visit.id,
             details=(
                 f"Added visit for wound #{wound.id}. "
+                f"Date: {new_visit.visit_date}. "
+                f"Length: {new_visit.length_cm} cm. "
+                f"Width: {new_visit.width_cm} cm. "
+                f"Depth: "
+                f"{new_visit.depth_cm if new_visit.depth_cm is not None else '-'}. "
                 f"Area: {new_visit.area} cm². "
-                f"Pain: {new_visit.pain_level if new_visit.pain_level is not None else '-'}"
+                f"Pain: "
+                f"{new_visit.pain_level if new_visit.pain_level is not None else '-'}. "
+                f"Condition: "
+                f"{new_visit.wound_condition or '-'}."
             )
         )
 
         db.session.commit()
 
-        flash("Visit added successfully.", "success")
+        flash(
+            "Visit added successfully.",
+            "success"
+        )
 
         return redirect(
             url_for(
@@ -726,6 +994,8 @@ def add_visit(wound_id):
         "add_visit.html",
         wound=wound
     )
+
+
 
 
 
@@ -1375,24 +1645,952 @@ def export_patient_pdf(patient_db_id):
     )
 
 
+@app.route("/patients/<int:patient_db_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_patient(patient_db_id):
 
+    patient = Patient.query.get_or_404(patient_db_id)
+
+    if request.method == "POST":
+
+        old_full_name = patient.full_name
+        old_birth_date = patient.birth_date
+
+        full_name = request.form.get("full_name", "").strip()
+        birth_date = request.form.get("birth_date", "").strip()
+
+        if not full_name:
+            flash("Full name is required.", "error")
+            return redirect(
+                url_for(
+                    "edit_patient",
+                    patient_db_id=patient.id
+                )
+            )
+
+        parsed_birth_date = None
+
+        if birth_date:
+            try:
+                parsed_birth_date = datetime.strptime(
+                    birth_date,
+                    "%Y-%m-%d"
+                ).date()
+
+                if parsed_birth_date > datetime.today().date():
+                    flash(
+                        "Birth date cannot be in the future.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for(
+                            "edit_patient",
+                            patient_db_id=patient.id
+                        )
+                    )
+
+            except ValueError:
+
+                flash(
+                    "Invalid birth date.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "edit_patient",
+                        patient_db_id=patient.id
+                    )
+                )
+
+        patient.full_name = full_name
+        patient.birth_date = parsed_birth_date
+
+        create_audit_log(
+            action="UPDATE",
+            record_type="PATIENT",
+            record_id=patient.id,
+            details=(
+                f"Patient updated. "
+                f"Name: {old_full_name} -> {patient.full_name}. "
+                f"Birth date: {old_birth_date} -> {patient.birth_date}"
+            )
+        )
+
+        db.session.commit()
+
+        flash(
+            "Patient updated successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "patient_details",
+                patient_db_id=patient.id
+            )
+        )
+
+    return render_template(
+        "edit_patient.html",
+        patient=patient
+    )
+
+
+@app.route("/wounds/<int:wound_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_wound(wound_id):
+
+    wound = Wound.query.get_or_404(wound_id)
+
+    if request.method == "POST":
+
+        old_location = wound.location
+        old_type = wound.wound_type
+        old_status = wound.status
+
+        location = request.form.get("location", "").strip()
+        wound_type = request.form.get("wound_type", "").strip()
+        status = request.form.get("status", "").strip()
+
+        if (
+            status in ["HEALED", "CLOSED"]
+            and g.user.role not in ["ADMIN", "DOCTOR"]
+        ):
+
+            flash(
+                "Only a Doctor or Admin can mark a wound as healed or closed.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "edit_wound",
+                    wound_id=wound.id
+                )
+            )
+
+        if not location:
+            flash(
+                "Wound location is required.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "edit_wound",
+                    wound_id=wound.id
+                )
+            )
+
+        if status not in ["ACTIVE", "HEALED", "CLOSED"]:
+
+            flash(
+                "Invalid wound status.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "edit_wound",
+                    wound_id=wound.id
+                )
+            )
+
+        wound.location = location
+        wound.wound_type = wound_type if wound_type else None
+        wound.status = status
+
+        create_audit_log(
+            action="UPDATE",
+            record_type="WOUND",
+            record_id=wound.id,
+            details=(
+                f"Wound updated. "
+                f"Location: {old_location} -> {wound.location}. "
+                f"Type: {old_type or '-'} -> {wound.wound_type or '-'}. "
+                f"Status: {old_status} -> {wound.status}"
+            )
+        )
+
+        db.session.commit()
+
+        flash(
+            "Wound updated successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "patient_details",
+                patient_db_id=wound.patient.id
+            )
+        )
+
+    return render_template(
+        "edit_wound.html",
+        wound=wound
+    )
+
+@app.route("/visits/<int:visit_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_visit(visit_id):
+
+    visit = Visit.query.get_or_404(visit_id)
+
+    if request.method == "POST":
+
+        old_visit_date = visit.visit_date
+        old_length = visit.length_cm
+        old_width = visit.width_cm
+        old_depth = visit.depth_cm
+        old_pain = visit.pain_level
+        old_condition = visit.wound_condition
+        old_notes = visit.notes
+        old_image_path = visit.image_path
+
+        visit_date = request.form.get("visit_date", "").strip()
+        length_cm = request.form.get("length_cm", "").strip()
+        width_cm = request.form.get("width_cm", "").strip()
+        depth_cm = request.form.get("depth_cm", "").strip()
+        pain_level = request.form.get("pain_level", "").strip()
+        wound_condition = request.form.get("wound_condition", "").strip()
+        notes = request.form.get("notes", "").strip()
+
+        if not visit_date or not length_cm or not width_cm:
+
+            flash(
+                "Visit date, length and width are required.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "edit_visit",
+                    visit_id=visit.id
+                )
+            )
+
+        try:
+
+            parsed_date = datetime.strptime(
+                visit_date,
+                "%Y-%m-%d"
+            ).date()
+
+            if parsed_date > datetime.today().date():
+
+                flash(
+                    "Visit date cannot be in the future.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "edit_visit",
+                        visit_id=visit.id
+                    )
+                )
+
+            length_value = float(length_cm)
+            width_value = float(width_cm)
+
+            if length_value <= 0 or width_value <= 0:
+
+                flash(
+                    "Length and width must be greater than zero.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "edit_visit",
+                        visit_id=visit.id
+                    )
+                )
+
+            depth_value = None
+
+            if depth_cm:
+
+                depth_value = float(depth_cm)
+
+                if depth_value < 0:
+
+                    flash(
+                        "Depth cannot be negative.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for(
+                            "edit_visit",
+                            visit_id=visit.id
+                        )
+                    )
+
+            pain_value = None
+
+            if pain_level:
+
+                pain_value = int(pain_level)
+
+                if pain_value < 0 or pain_value > 10:
+
+                    flash(
+                        "Pain level must be between 0 and 10.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for(
+                            "edit_visit",
+                            visit_id=visit.id
+                        )
+                    )
+
+        except ValueError:
+
+            flash(
+                "Invalid visit data.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "edit_visit",
+                    visit_id=visit.id
+                )
+            )
+
+        image = request.files.get("image")
+
+        if image and image.filename:
+
+            filename = secure_filename(
+                image.filename
+            )
+
+            filename = (
+                f"{visit.wound.id}_"
+                f"{datetime.now().timestamp()}_"
+                f"{filename}"
+            )
+
+            save_path = os.path.join(
+                app.config["UPLOAD_FOLDER"],
+                filename
+            )
+
+            image.save(save_path)
+
+            visit.image_path = (
+                f"uploads/{filename}"
+            )
+
+        visit.visit_date = parsed_date
+        visit.length_cm = length_value
+        visit.width_cm = width_value
+        visit.depth_cm = depth_value
+        visit.pain_level = pain_value
+        visit.wound_condition = wound_condition or None
+        visit.notes = notes or None
+
+        create_audit_log(
+            action="UPDATE",
+            record_type="VISIT",
+            record_id=visit.id,
+            details=(
+                f"Visit updated. "
+                f"Date: {old_visit_date} -> {visit.visit_date}. "
+                f"Length: {old_length} -> {visit.length_cm}. "
+                f"Width: {old_width} -> {visit.width_cm}. "
+                f"Depth: {old_depth} -> {visit.depth_cm}. "
+                f"Pain: {old_pain} -> {visit.pain_level}. "
+                f"Condition: {old_condition or '-'} -> "
+                f"{visit.wound_condition or '-'}. "
+                f"Notes updated: "
+                f"{old_notes != visit.notes}. "
+                f"Image changed: "
+                f"{old_image_path != visit.image_path}"
+            )
+        )
+
+        db.session.commit()
+
+        flash(
+            "Visit updated successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "patient_details",
+                patient_db_id=visit.wound.patient.id
+            )
+        )
+
+    return render_template(
+        "edit_visit.html",
+        visit=visit
+    )
+
+
+@app.route("/reports")
+@login_required
+def reports_center():
+
+    # =========================
+    # PATIENT REPORT SEARCH
+    # =========================
+
+    patient = None
+    wounds = []
+
+    patient_id = request.args.get(
+        "patient_id",
+        ""
+    ).strip()
+
+    if patient_id:
+
+        patient = Patient.query.filter_by(
+            patient_id=patient_id
+        ).first()
+
+        if patient:
+
+            wounds = patient.wounds
+
+        else:
+
+            flash(
+                "Patient not found.",
+                "error"
+            )
+
+
+    # =========================
+    # AUDIT TRAIL FILTERS
+    # =========================
+
+    audit_logs = []
+    audit_users = []
+
+    selected_user_id = request.args.get(
+        "audit_user_id",
+        "",
+        type=str
+    )
+
+    selected_action = request.args.get(
+        "audit_action",
+        ""
+    ).strip()
+
+    selected_record_type = request.args.get(
+        "audit_record_type",
+        ""
+    ).strip()
+
+    start_date = request.args.get(
+        "audit_start_date",
+        ""
+    ).strip()
+
+    end_date = request.args.get(
+        "audit_end_date",
+        ""
+    ).strip()
+
+
+    if g.user.role == "ADMIN":
+
+        audit_users = User.query.order_by(
+            User.full_name.asc()
+        ).all()
+
+        query = AuditLog.query
+
+        if selected_user_id:
+
+            try:
+
+                query = query.filter(
+                    AuditLog.user_id == int(selected_user_id)
+                )
+
+            except ValueError:
+                pass
+
+
+        if selected_action:
+
+            query = query.filter(
+                AuditLog.action == selected_action
+            )
+
+
+        if selected_record_type:
+
+            query = query.filter(
+                AuditLog.record_type == selected_record_type
+            )
+
+
+        if start_date:
+
+            try:
+
+                parsed_start = datetime.strptime(
+                    start_date,
+                    "%Y-%m-%d"
+                )
+
+                query = query.filter(
+                    AuditLog.timestamp >= parsed_start
+                )
+
+            except ValueError:
+                pass
+
+
+        if end_date:
+
+            try:
+
+                parsed_end = datetime.strptime(
+                    end_date,
+                    "%Y-%m-%d"
+                )
+
+                next_day = parsed_end + timedelta(days=1)
+
+                query = query.filter(
+                    AuditLog.timestamp < next_day
+                )
+
+            except ValueError:
+                pass
+
+
+        audit_logs = query.order_by(
+            AuditLog.timestamp.desc()
+        ).all()
+
+
+    audit_user_map = {
+        user.id: user
+        for user in audit_users
+    }
+
+
+    return render_template(
+        "reports.html",
+
+        patient=patient,
+        wounds=wounds,
+        patient_id=patient_id,
+
+        audit_logs=audit_logs,
+        audit_users=audit_users,
+        audit_user_map=audit_user_map,
+
+        selected_user_id=selected_user_id,
+        selected_action=selected_action,
+        selected_record_type=selected_record_type,
+        start_date=start_date,
+        end_date=end_date
+    )
+
+@app.route("/reports/audit/pdf")
+@roles_required("ADMIN")
+def export_audit_pdf():
+
+    selected_user_id = request.args.get(
+        "audit_user_id",
+        ""
+    ).strip()
+
+    selected_action = request.args.get(
+        "audit_action",
+        ""
+    ).strip()
+
+    selected_record_type = request.args.get(
+        "audit_record_type",
+        ""
+    ).strip()
+
+    start_date = request.args.get(
+        "audit_start_date",
+        ""
+    ).strip()
+
+    end_date = request.args.get(
+        "audit_end_date",
+        ""
+    ).strip()
+
+
+    query = AuditLog.query
+
+
+    if selected_user_id:
+
+        try:
+
+            query = query.filter(
+                AuditLog.user_id == int(selected_user_id)
+            )
+
+        except ValueError:
+            pass
+
+
+    if selected_action:
+
+        query = query.filter(
+            AuditLog.action == selected_action
+        )
+
+
+    if selected_record_type:
+
+        query = query.filter(
+            AuditLog.record_type == selected_record_type
+        )
+
+
+    if start_date:
+
+        try:
+
+            parsed_start = datetime.strptime(
+                start_date,
+                "%Y-%m-%d"
+            )
+
+            query = query.filter(
+                AuditLog.timestamp >= parsed_start
+            )
+
+        except ValueError:
+            pass
+
+
+    if end_date:
+
+        try:
+
+            parsed_end = datetime.strptime(
+                end_date,
+                "%Y-%m-%d"
+            )
+
+            next_day = parsed_end + timedelta(days=1)
+
+            query = query.filter(
+                AuditLog.timestamp < next_day
+            )
+
+        except ValueError:
+            pass
+
+
+    logs = query.order_by(
+        AuditLog.timestamp.desc()
+    ).all()
+
+
+    users = {
+        user.id: user
+        for user in User.query.all()
+    }
+
+
+    buffer = BytesIO()
+
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=1.2 * cm,
+        leftMargin=1.2 * cm,
+        topMargin=1.2 * cm,
+        bottomMargin=1.2 * cm
+    )
+
+    styles = getSampleStyleSheet()
+
+    elements = []
+
+
+    elements.append(
+        Paragraph(
+            "Audit Trail Report",
+            styles["Title"]
+        )
+    )
+
+    elements.append(
+        Spacer(1, 10)
+    )
+
+
+    filter_text = []
+
+    if selected_user_id:
+
+        user = users.get(
+            int(selected_user_id)
+        )
+
+        if user:
+
+            filter_text.append(
+                f"User: {user.full_name} ({user.role})"
+            )
+
+    if selected_action:
+
+        filter_text.append(
+            f"Action: {selected_action}"
+        )
+
+    if selected_record_type:
+
+        filter_text.append(
+            f"Record Type: {selected_record_type}"
+        )
+
+    if start_date:
+
+        filter_text.append(
+            f"From: {start_date}"
+        )
+
+    if end_date:
+
+        filter_text.append(
+            f"To: {end_date}"
+        )
+
+
+    if filter_text:
+
+        elements.append(
+            Paragraph(
+                "Filters: " + " | ".join(filter_text),
+                styles["Normal"]
+            )
+        )
+
+    else:
+
+        elements.append(
+            Paragraph(
+                "Filters: All records",
+                styles["Normal"]
+            )
+        )
+
+
+    elements.append(
+        Spacer(1, 12)
+    )
+
+
+    rows = [[
+        "Date & Time",
+        "User",
+        "Role",
+        "Action",
+        "Record Type",
+        "Record ID",
+        "Details"
+    ]]
+
+
+    for log in logs:
+
+        user_name = "System"
+        user_role = "-"
+
+        if log.user_id and log.user_id in users:
+
+            user_name = users[
+                log.user_id
+            ].full_name
+
+            user_role = users[
+                log.user_id
+            ].role
+
+
+        rows.append([
+            log.timestamp.strftime(
+                "%d/%m/%Y %H:%M:%S"
+            ),
+
+            user_name,
+
+            user_role,
+
+            log.action,
+
+            log.record_type,
+
+            str(
+                log.record_id
+                if log.record_id is not None
+                else "-"
+            ),
+
+            Paragraph(
+                log.details or "-",
+                styles["BodyText"]
+            )
+        ])
+
+
+    audit_table = Table(
+        rows,
+        repeatRows=1,
+        colWidths=[
+            2.7 * cm,
+            2.6 * cm,
+            1.6 * cm,
+            1.8 * cm,
+            2.0 * cm,
+            1.5 * cm,
+            5.4 * cm
+        ]
+    )
+
+
+    audit_table.setStyle(
+        TableStyle([
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, 0),
+                colors.lightgrey
+            ),
+            (
+                "GRID",
+                (0, 0),
+                (-1, -1),
+                0.4,
+                colors.grey
+            ),
+            (
+                "VALIGN",
+                (0, 0),
+                (-1, -1),
+                "TOP"
+            ),
+            (
+                "FONTSIZE",
+                (0, 0),
+                (-1, -1),
+                7
+            ),
+            (
+                "PADDING",
+                (0, 0),
+                (-1, -1),
+                4
+            )
+        ])
+    )
+
+
+    elements.append(
+        audit_table
+    )
+
+    elements.append(
+        Spacer(1, 15)
+    )
+
+
+    elements.append(
+        Paragraph(
+            f"Total Records: {len(logs)}",
+            styles["Normal"]
+        )
+    )
+
+
+    elements.append(
+        Paragraph(
+            (
+                f"Generated by: "
+                f"{g.user.full_name} "
+                f"({g.user.role})"
+            ),
+            styles["Normal"]
+        )
+    )
+
+
+    doc.build(
+        elements
+    )
+
+
+    create_audit_log(
+        action="EXPORT",
+        record_type="AUDIT",
+        record_id=None,
+        details=(
+            "Exported filtered Audit Trail report to PDF"
+        )
+    )
+
+    db.session.commit()
+
+
+    buffer.seek(0)
+
+
+    return Response(
+        buffer.getvalue(),
+        mimetype="application/pdf",
+        headers={
+            "Content-Disposition":
+                "attachment; filename=audit_trail_report.pdf"
+        }
+    )
+
+#######################################3
 if __name__ == "__main__":
 
     with app.app_context():
 
         db.create_all()
 
+        admin_username = os.getenv(
+            "INITIAL_ADMIN_USERNAME",
+            "admin"
+        )
+
+        admin_password = os.getenv(
+            "INITIAL_ADMIN_PASSWORD"
+        )
+
         admin = User.query.filter_by(
-            username="admin"
+            username=admin_username
         ).first()
 
-        if admin is None:
+        if admin is None and admin_password:
 
             admin = User(
                 full_name="System Administrator",
-                username="admin",
+                username=admin_username,
                 password=generate_password_hash(
-                    "Admin123!"
+                    admin_password
                 ),
                 role="ADMIN",
                 is_active=True
@@ -1406,5 +2604,3 @@ if __name__ == "__main__":
             )
 
     app.run(debug=True)
-
-

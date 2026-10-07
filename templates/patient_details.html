@@ -47,6 +47,13 @@ Patient Details - WoundCare
         <strong>Total Wounds:</strong>
         {{ patient.wounds|length }}
     </p>
+    <a
+    href="{{ url_for('edit_patient', patient_db_id=patient.id) }}"
+    class="secondary-button"
+>
+    Edit Patient
+</a>
+
 <a
     href="{{ url_for('patient_report', patient_db_id=patient.id) }}"
     class="secondary-button"
@@ -130,6 +137,12 @@ Patient Details - WoundCare
                     >
                         + Add Visit
                     </a>
+                    <a
+    href="{{ url_for('edit_wound', wound_id=wound.id) }}"
+    class="secondary-button"
+>
+    Edit Wound
+</a>
 <a
     href="{{ url_for('compare_visits', wound_id=wound.id) }}"
     class="secondary-button"
@@ -242,7 +255,16 @@ Patient Details - WoundCare
                                     </p>
 
                                 {% endif %}
+<div class="visit-actions">
 
+    <a
+        href="{{ url_for('edit_visit', visit_id=visit.id) }}"
+        class="secondary-button"
+    >
+        Edit Visit
+    </a>
+
+</div>
                             </div>
 
 

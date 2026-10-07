@@ -1,0 +1,584 @@
+{% extends "base.html" %}
+
+{% block title %}
+Reports Center - WoundCare
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <h1>Reports Center</h1>
+
+    <p>
+        Generate patient reports and review system audit records.
+    </p>
+
+</section>
+
+
+<!-- ========================= -->
+<!-- PATIENT REPORTS -->
+<!-- ========================= -->
+
+<div class="reports-main-section">
+
+    <div class="reports-section-header">
+
+        <div>
+            <h2>Patient Reports</h2>
+
+            <p>
+                Search for a patient by ID and generate clinical reports.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="report-search-card">
+
+        <form method="GET">
+
+            <div class="report-search-row">
+
+                <div class="form-group report-search-input">
+
+                    <label>
+                        Patient ID
+                    </label>
+
+                    <input
+                        type="text"
+                        name="patient_id"
+                        value="{{ patient_id }}"
+                        placeholder="Enter patient ID"
+                        required
+                    >
+
+                </div>
+
+                <div class="report-search-button">
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
+                        Search Patient
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    {% if patient %}
+
+        <div class="report-patient-card">
+
+            <div class="report-patient-header">
+
+                <div>
+
+                    <h2>
+                        {{ patient.full_name }}
+                    </h2>
+
+                    <p>
+                        <strong>Patient ID:</strong>
+                        {{ patient.patient_id }}
+                    </p>
+
+                    <p>
+                        <strong>Total Wounds:</strong>
+                        {{ patient.wounds|length }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="report-actions">
+
+                <h3>Patient Report Options</h3>
+
+                <div class="report-button-row">
+
+                    <a
+                        href="{{ url_for('patient_report', patient_db_id=patient.id) }}"
+                        class="primary-button"
+                    >
+                        View Patient Report
+                    </a>
+
+                    <a
+                        href="{{ url_for('export_patient_pdf', patient_db_id=patient.id) }}"
+                        class="secondary-button"
+                    >
+                        Export Patient PDF
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="patient-wounds-section">
+
+                <h3>
+                    Wounds
+                </h3>
+
+                {% if wounds %}
+
+                    {% for wound in wounds %}
+
+                        <div class="report-wound-card">
+
+                            <div class="report-wound-info">
+
+                                <h4>
+                                    Wound #{{ wound.id }}
+                                </h4>
+
+                                <p>
+                                    <strong>Location:</strong>
+                                    {{ wound.location }}
+                                </p>
+
+                                <p>
+                                    <strong>Type:</strong>
+                                    {{ wound.wound_type or "-" }}
+                                </p>
+
+                                <p>
+                                    <strong>Status:</strong>
+                                    {{ wound.status }}
+                                </p>
+
+                                <p>
+                                    <strong>Visits:</strong>
+                                    {{ wound.visits|length }}
+                                </p>
+
+                            </div>
+
+
+                            <div class="report-wound-actions">
+
+                                <a
+                                    href="{{ url_for('compare_visits', wound_id=wound.id) }}"
+                                    class="secondary-button"
+                                >
+                                    Compare Visits
+                                </a>
+
+                                <a
+                                    href="{{ url_for('export_wound_csv', wound_id=wound.id) }}"
+                                    class="secondary-button"
+                                >
+                                    Export CSV
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <p>
+                            No wounds found for this patient.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- AUDIT TRAIL REPORT -->
+<!-- ========================= -->
+
+{% if g.user.role == "ADMIN" %}
+
+<div class="reports-main-section audit-report-section">
+
+    <div class="reports-section-header">
+
+        <div>
+
+            <h2>Audit Trail Report</h2>
+
+            <p>
+                Filter system activity by user, action,
+                record type or date range.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="audit-filter-card">
+
+        <form method="GET">
+
+            <!-- Preserve patient search -->
+            {% if patient_id %}
+
+                <input
+                    type="hidden"
+                    name="patient_id"
+                    value="{{ patient_id }}"
+                >
+
+            {% endif %}
+
+
+            <div class="audit-filter-grid">
+
+
+                <div class="form-group">
+
+                    <label>
+                        User
+                    </label>
+
+                    <select name="audit_user_id">
+
+                        <option value="">
+                            All Users
+                        </option>
+
+                        {% for user in audit_users %}
+
+                            <option
+                                value="{{ user.id }}"
+                                {% if selected_user_id == user.id|string %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ user.full_name }}
+                                ({{ user.role }})
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Action
+                    </label>
+
+                    <select name="audit_action">
+
+                        <option value="">
+                            All Actions
+                        </option>
+
+                        <option
+                            value="CREATE"
+                            {% if selected_action == "CREATE" %}
+                                selected
+                            {% endif %}
+                        >
+                            CREATE
+                        </option>
+
+                        <option
+                            value="UPDATE"
+                            {% if selected_action == "UPDATE" %}
+                                selected
+                            {% endif %}
+                        >
+                            UPDATE
+                        </option>
+
+                        <option
+                            value="EXPORT"
+                            {% if selected_action == "EXPORT" %}
+                                selected
+                            {% endif %}
+                        >
+                            EXPORT
+                        </option>
+
+                        <option
+                            value="VIEW_REPORT"
+                            {% if selected_action == "VIEW_REPORT" %}
+                                selected
+                            {% endif %}
+                        >
+                            VIEW REPORT
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Record Type
+                    </label>
+
+                    <select name="audit_record_type">
+
+                        <option value="">
+                            All Record Types
+                        </option>
+
+                        <option
+                            value="PATIENT"
+                            {% if selected_record_type == "PATIENT" %}
+                                selected
+                            {% endif %}
+                        >
+                            PATIENT
+                        </option>
+
+                        <option
+                            value="WOUND"
+                            {% if selected_record_type == "WOUND" %}
+                                selected
+                            {% endif %}
+                        >
+                            WOUND
+                        </option>
+
+                        <option
+                            value="VISIT"
+                            {% if selected_record_type == "VISIT" %}
+                                selected
+                            {% endif %}
+                        >
+                            VISIT
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        From Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="audit_start_date"
+                        value="{{ start_date }}"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        To Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="audit_end_date"
+                        value="{{ end_date }}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="audit-filter-actions">
+
+                <a
+                    href="{{ url_for('reports_center') }}"
+                    class="secondary-button"
+                >
+                    Clear Filters
+                </a>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Apply Filters
+                </button>
+
+            </div>
+
+        </form>
+<div class="audit-export-actions">
+
+    <a
+        href="{{ url_for(
+            'export_audit_pdf',
+            audit_user_id=selected_user_id,
+            audit_action=selected_action,
+            audit_record_type=selected_record_type,
+            audit_start_date=start_date,
+            audit_end_date=end_date
+        ) }}"
+        class="secondary-button"
+    >
+        Export Audit PDF
+    </a>
+
+</div>
+    </div>
+
+
+    <div class="audit-results-header">
+
+        <h3>
+            Audit Results
+        </h3>
+
+        <span class="audit-result-count">
+            {{ audit_logs|length }} records
+        </span>
+
+    </div>
+
+
+    <div class="table-container audit-table-container">
+
+        <table class="data-table">
+
+            <thead>
+
+                <tr>
+                    <th>Date & Time</th>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                    <th>Record Type</th>
+                    <th>Record ID</th>
+                    <th>Details</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for log in audit_logs %}
+
+                    <tr>
+
+                        <td>
+                            {{ log.timestamp.strftime("%d/%m/%Y %H:%M:%S") }}
+                        </td>
+
+
+                        <td>
+
+                            {% if log.user_id and log.user_id in audit_user_map %}
+
+                                {{ audit_user_map[log.user_id].full_name }}
+
+                            {% else %}
+
+                                System
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if log.user_id and log.user_id in audit_user_map %}
+
+                                {{ audit_user_map[log.user_id].role }}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="audit-action">
+                                {{ log.action }}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+                            {{ log.record_type }}
+                        </td>
+
+
+                        <td>
+                            {{ log.record_id or "-" }}
+                        </td>
+
+
+                        <td>
+                            {{ log.details or "-" }}
+                        </td>
+
+                    </tr>
+
+
+                {% else %}
+
+                    <tr>
+
+                        <td
+                            colspan="7"
+                            class="empty-table-cell"
+                        >
+                            No audit records found
+                            for the selected filters.
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+{% endblock %}

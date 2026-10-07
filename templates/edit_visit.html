@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Visit - WoundCare
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <h1>Edit Visit</h1>
+
+    <p>
+        Patient: {{ visit.wound.patient.full_name }}
+        |
+        Wound: {{ visit.wound.location }}
+    </p>
+
+</section>
+
+
+<div class="form-container">
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        <div class="form-group">
+
+            <label>
+                Visit Date
+            </label>
+
+            <input
+                type="date"
+                name="visit_date"
+                value="{{ visit.visit_date.strftime('%Y-%m-%d') }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Length (cm)
+            </label>
+
+            <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                name="length_cm"
+                value="{{ visit.length_cm }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Width (cm)
+            </label>
+
+            <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                name="width_cm"
+                value="{{ visit.width_cm }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Depth (cm)
+            </label>
+
+            <input
+                type="number"
+                step="0.01"
+                min="0"
+                name="depth_cm"
+                value="{% if visit.depth_cm is not none %}{{ visit.depth_cm }}{% endif %}"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Pain Level (0-10)
+            </label>
+
+            <input
+                type="number"
+                min="0"
+                max="10"
+                name="pain_level"
+                value="{% if visit.pain_level is not none %}{{ visit.pain_level }}{% endif %}"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Wound Condition
+            </label>
+
+            <select name="wound_condition">
+
+                <option value="">
+                    Select condition
+                </option>
+
+                <option
+                    value="Improving"
+                    {% if visit.wound_condition == "Improving" %}selected{% endif %}
+                >
+                    Improving
+                </option>
+
+                <option
+                    value="Stable"
+                    {% if visit.wound_condition == "Stable" %}selected{% endif %}
+                >
+                    Stable
+                </option>
+
+                <option
+                    value="Worsening"
+                    {% if visit.wound_condition == "Worsening" %}selected{% endif %}
+                >
+                    Worsening
+                </option>
+
+                <option
+                    value="Infected"
+                    {% if visit.wound_condition == "Infected" %}selected{% endif %}
+                >
+                    Suspected Infection
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Notes
+            </label>
+
+            <textarea
+                name="notes"
+                rows="5"
+            >{{ visit.notes or "" }}</textarea>
+
+        </div>
+
+
+        {% if visit.image_path %}
+
+            <div class="form-group">
+
+                <label>
+                    Current Image
+                </label>
+
+                <img
+                    src="{{ url_for('static', filename=visit.image_path) }}"
+                    alt="Current wound image"
+                    class="wound-image"
+                >
+
+            </div>
+
+        {% endif %}
+
+
+        <div class="form-group">
+
+            <label>
+                Replace Image
+            </label>
+
+            <input
+                type="file"
+                name="image"
+                accept="image/*"
+            >
+
+            <small>
+                Leave empty to keep the current image.
+            </small>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('patient_details', patient_db_id=visit.wound.patient.id) }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Save Changes
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
