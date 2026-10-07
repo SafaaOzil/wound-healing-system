@@ -16,6 +16,11 @@ instance/
 *.sqlite
 *.sqlite3
 
+
+uploads/
+.env
+
+static/uploads/
 # IDE
 .vscode/
 .idea/

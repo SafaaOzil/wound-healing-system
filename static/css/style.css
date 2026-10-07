@@ -74,6 +74,7 @@ body {
     font-size: 38px;
     font-weight: bold;
 }
+
 .page-header-row,
 .section-header {
     display: flex;
@@ -106,7 +107,6 @@ body {
 .table-container,
 .form-container,
 .patient-info-card,
-.wound-card,
 .empty-state {
     background-color: white;
     border: 1px solid #e5e5e5;
@@ -152,6 +152,22 @@ body {
     border-radius: 8px;
 }
 
+.form-group select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    background-color: white;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    resize: vertical;
+}
+
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -162,20 +178,113 @@ body {
     margin-bottom: 30px;
 }
 
-.wound-card {
-    margin-bottom: 15px;
-}
-
 .empty-state {
     text-align: center;
     color: #666666;
 }
 
 
-.form-group select {
-    width: 100%;
-    padding: 11px;
-    border: 1px solid #cccccc;
-    border-radius: 8px;
+/* Wounds */
+
+.wound-card {
     background-color: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.wound-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.wound-header h3 {
+    margin-top: 0;
+}
+
+
+/* Visits */
+
+.visit-list {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eeeeee;
+}
+
+.visit-list h4 {
+    margin-top: 0;
+}
+
+.visit-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    background-color: #f8f9fb;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 12px;
+}
+
+.visit-info {
+    flex: 1;
+}
+
+.visit-info p {
+    margin: 7px 0;
+}
+
+.visit-image-container {
+    display: flex;
+    align-items: center;
+}
+
+.wound-image {
+    width: 220px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid #dddddd;
+}
+
+.empty-visits {
+    margin-top: 20px;
+    background-color: #f8f9fb;
+    border-radius: 10px;
+    padding: 15px;
+    color: #666666;
+}
+
+
+/* Responsive */
+
+@media (max-width: 800px) {
+
+    .wound-header {
+        flex-direction: column;
+    }
+
+    .visit-card {
+        flex-direction: column;
+    }
+
+    .wound-image {
+        width: 100%;
+    }
+}
+
+
+
+
+.chart-container {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eeeeee;
+}
+
+.chart-container canvas {
+    max-height: 350px;
 }

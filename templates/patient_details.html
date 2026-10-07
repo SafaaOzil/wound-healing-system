@@ -56,11 +56,11 @@ Patient Details - WoundCare
     <h2>Wounds</h2>
 
     <a
-    href="{{ url_for('add_wound', patient_db_id=patient.id) }}"
-    class="primary-button"
->
-    + Add Wound
-</a>
+        href="{{ url_for('add_wound', patient_db_id=patient.id) }}"
+        class="primary-button"
+    >
+        + Add Wound
+    </a>
 
 </div>
 
@@ -71,32 +71,312 @@ Patient Details - WoundCare
 
         <div class="wound-card">
 
-            <h3>
-                {{ wound.location }}
-            </h3>
+            <div class="wound-header">
 
-            <p>
-                Type: {{ wound.wound_type or "-" }}
-            </p>
+                <div>
 
-            <p>
-                Status: {{ wound.status }}
-            </p>
+                    <h3>
+                        {{ wound.location }}
+                    </h3>
+
+                    <p>
+                        <strong>Type:</strong>
+                        {{ wound.wound_type or "-" }}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        {{ wound.status }}
+                    </p>
+
+                    <p>
+                        <strong>Visits:</strong>
+                        {{ wound.visits|length }}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <a
+                        href="{{ url_for('add_visit', wound_id=wound.id) }}"
+                        class="primary-button"
+                    >
+                        + Add Visit
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            {% if wound_progress[wound.id] %}
+
+                <div class="visit-list">
+
+                    <h4>Healing Timeline</h4>
+
+                    {% for item in wound_progress[wound.id] %}
+
+                        {% set visit = item.visit %}
+
+                        <div class="visit-card">
+
+                            <div class="visit-info">
+
+                                <p>
+                                    <strong>Date:</strong>
+                                    {{ visit.visit_date.strftime("%d/%m/%Y") }}
+                                </p>
+
+                                <p>
+                                    <strong>Size:</strong>
+                                    {{ visit.length_cm }}
+                                    ×
+                                    {{ visit.width_cm }}
+                                    cm
+                                </p>
+
+                                <p>
+                                    <strong>Area:</strong>
+                                    {{ visit.area }} cm²
+                                </p>
+
+                                <p>
+                                    <strong>Depth:</strong>
+
+                                    {% if visit.depth_cm is not none %}
+                                        {{ visit.depth_cm }} cm
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </p>
+
+                                <p>
+                                    <strong>Pain:</strong>
+
+                                    {% if visit.pain_level is not none %}
+                                        {{ visit.pain_level }}/10
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </p>
+
+                                <p>
+                                    <strong>Condition:</strong>
+                                    {{ visit.wound_condition or "-" }}
+                                </p>
+
+                                <p>
+                                    <strong>Progress:</strong>
+                                    {{ item.progress_status }}
+                                </p>
+
+
+                                {% if item.change_percent is not none %}
+
+                                    <p>
+                                        <strong>Area Change:</strong>
+
+                                        {% if item.change_percent > 0 %}
+
+                                            {{ item.change_percent }}% reduction
+
+                                        {% elif item.change_percent < 0 %}
+
+                                            {{ item.change_percent|abs }}% increase
+
+                                        {% else %}
+
+                                            No change
+
+                                        {% endif %}
+                                    </p>
+
+                                {% endif %}
+
+
+                                {% if visit.notes %}
+
+                                    <p>
+                                        <strong>Notes:</strong>
+                                        {{ visit.notes }}
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            {% if visit.image_path %}
+
+                                <div class="visit-image-container">
+
+                                    <img
+                                        src="{{ url_for('static', filename=visit.image_path) }}"
+                                        alt="Wound image"
+                                        class="wound-image"
+                                    >
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                {% if wound_progress[wound.id]|length > 1 %}
+
+                    <div class="chart-container">
+
+                        <h4>Wound Area Progress</h4>
+
+                        <canvas
+                            id="woundChart{{ wound.id }}"
+                        ></canvas>
+
+                    </div>
+
+
+                    <script>
+
+                        document.addEventListener(
+                            "DOMContentLoaded",
+                            function () {
+
+                                const ctx =
+                                    document.getElementById(
+                                        "woundChart{{ wound.id }}"
+                                    );
+
+                                new Chart(ctx, {
+
+                                    type: "line",
+
+                                    data: {
+
+                                        labels: [
+
+                                            {% for item in wound_progress[wound.id] %}
+
+                                                "{{ item.visit.visit_date.strftime('%d/%m/%Y') }}"{% if not loop.last %},{% endif %}
+
+                                            {% endfor %}
+
+                                        ],
+
+                                        datasets: [
+
+                                            {
+
+                                                label:
+                                                    "Wound Area (cm²)",
+
+                                                data: [
+
+                                                    {% for item in wound_progress[wound.id] %}
+
+                                                        {{ item.visit.area }}{% if not loop.last %},{% endif %}
+
+                                                    {% endfor %}
+
+                                                ],
+
+                                                borderWidth: 2,
+
+                                                tension: 0.3,
+
+                                                fill: false
+
+                                            }
+
+                                        ]
+
+                                    },
+
+                                    options: {
+
+                                        responsive: true,
+
+                                        maintainAspectRatio: false,
+
+                                        scales: {
+
+                                            y: {
+
+                                                beginAtZero: true,
+
+                                                title: {
+
+                                                    display: true,
+
+                                                    text:
+                                                        "Area (cm²)"
+
+                                                }
+
+                                            },
+
+                                            x: {
+
+                                                title: {
+
+                                                    display: true,
+
+                                                    text:
+                                                        "Visit Date"
+
+                                                }
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                });
+
+                            }
+                        );
+
+                    </script>
+
+                {% endif %}
+
+
+            {% else %}
+
+                <div class="empty-visits">
+
+                    No visits have been recorded yet.
+
+                </div>
+
+            {% endif %}
 
         </div>
 
     {% endfor %}
 
+
 {% else %}
 
-<div class="empty-state">
+    <div class="empty-state">
 
-    <p>
-        No wounds have been added for this patient yet.
-    </p>
+        <h3>No wounds yet</h3>
 
-</div>
+        <p>
+            No wounds have been added for this patient.
+        </p>
+
+    </div>
 
 {% endif %}
+
 
 {% endblock %}

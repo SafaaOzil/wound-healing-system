@@ -5,11 +5,19 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from models import db, Patient, Wound, Visit
 
 
+import os
+from werkzeug.utils import secure_filename
+
+
+
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///wound_system.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "dev-secret-key"
+
+app.config["UPLOAD_FOLDER"] = "static/uploads"
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 db.init_app(app)
 
@@ -96,11 +104,58 @@ def patient_details(patient_db_id):
 
     patient = Patient.query.get_or_404(patient_db_id)
 
+    wound_progress = {}
+
+    for wound in patient.wounds:
+
+        visits = sorted(
+            wound.visits,
+            key=lambda v: v.visit_date
+        )
+
+        progress_data = []
+
+        previous_visit = None
+
+        for visit in visits:
+
+            change_percent = None
+            progress_status = "First Visit"
+
+            if previous_visit and previous_visit.area > 0:
+
+                change_percent = round(
+                    (
+                        (previous_visit.area - visit.area)
+                        / previous_visit.area
+                    ) * 100,
+                    2
+                )
+
+                if change_percent > 5:
+                    progress_status = "Improving"
+
+                elif change_percent < -5:
+                    progress_status = "Worsening"
+
+                else:
+                    progress_status = "Stable"
+
+            progress_data.append({
+                "visit": visit,
+                "change_percent": change_percent,
+                "progress_status": progress_status
+            })
+
+            previous_visit = visit
+
+        wound_progress[wound.id] = progress_data
+
     return render_template(
         "patient_details.html",
-        patient=patient
+        patient=patient,
+        wound_progress=wound_progress
     )
-
 
 
 @app.route("/patients/<int:patient_db_id>/wounds/add", methods=["GET", "POST"])
@@ -151,7 +206,101 @@ def add_wound(patient_db_id):
 
 
 
+@app.route("/wounds/<int:wound_id>/visits/add", methods=["GET", "POST"])
+def add_visit(wound_id):
 
+    wound = Wound.query.get_or_404(wound_id)
+
+    if request.method == "POST":
+
+        visit_date = request.form.get("visit_date")
+        length_cm = request.form.get("length_cm")
+        width_cm = request.form.get("width_cm")
+        depth_cm = request.form.get("depth_cm")
+        pain_level = request.form.get("pain_level")
+        wound_condition = request.form.get("wound_condition")
+        notes = request.form.get("notes")
+
+        if not visit_date or not length_cm or not width_cm:
+            flash("Visit date, length and width are required.", "error")
+            return redirect(
+                url_for("add_visit", wound_id=wound.id)
+            )
+
+        try:
+            parsed_date = datetime.strptime(
+                visit_date,
+                "%Y-%m-%d"
+            ).date()
+
+            length_cm = float(length_cm)
+            width_cm = float(width_cm)
+
+            depth_cm = (
+                float(depth_cm)
+                if depth_cm
+                else None
+            )
+
+            pain_level = (
+                int(pain_level)
+                if pain_level
+                else None
+            )
+
+        except ValueError:
+            flash("Invalid visit data.", "error")
+            return redirect(
+                url_for("add_visit", wound_id=wound.id)
+            )
+
+        image_path = None
+
+        image = request.files.get("image")
+
+        if image and image.filename:
+
+            filename = secure_filename(image.filename)
+
+            filename = f"{wound.id}_{datetime.now().timestamp()}_{filename}"
+
+            save_path = os.path.join(
+                app.config["UPLOAD_FOLDER"],
+                filename
+            )
+
+            image.save(save_path)
+
+            image_path = f"uploads/{filename}"
+
+        new_visit = Visit(
+            wound_id=wound.id,
+            visit_date=parsed_date,
+            length_cm=length_cm,
+            width_cm=width_cm,
+            depth_cm=depth_cm,
+            pain_level=pain_level,
+            wound_condition=wound_condition,
+            notes=notes,
+            image_path=image_path
+        )
+
+        db.session.add(new_visit)
+        db.session.commit()
+
+        flash("Visit added successfully.", "success")
+
+        return redirect(
+            url_for(
+                "patient_details",
+                patient_db_id=wound.patient.id
+            )
+        )
+
+    return render_template(
+        "add_visit.html",
+        wound=wound
+    )
 
 
 
