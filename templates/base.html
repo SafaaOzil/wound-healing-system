@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        Wound Healing Monitoring System
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            WoundCare
+        </div>
+
+        <div class="nav-links">
+<a href="{{ url_for('dashboard') }}">Dashboard</a>
+<a href="{{ url_for('patients') }}">Patients</a>
+            <a href="#">Wounds</a>
+            <a href="#">Audit Trail</a>
+        </div>
+
+    </nav>
+
+    <main class="main-container">
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+</body>
+</html>

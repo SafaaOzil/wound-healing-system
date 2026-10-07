@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Patient - WoundCare
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <h1>Add Patient</h1>
+
+    <p>
+        Create a new patient record.
+    </p>
+
+</section>
+
+
+<div class="form-container">
+
+    <form method="POST">
+
+        <div class="form-group">
+
+            <label>
+                Patient ID
+            </label>
+
+            <input
+                type="text"
+                name="patient_id"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Full Name
+            </label>
+
+            <input
+                type="text"
+                name="full_name"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Birth Date
+            </label>
+
+            <input
+                type="date"
+                name="birth_date"
+            >
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('patients') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Save Patient
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
