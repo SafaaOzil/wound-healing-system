@@ -384,3 +384,187 @@ def test_nurse_cannot_open_audit_trail(nurse_login):
     assert response.status_code == 200
 
     assert b"You do not have permission" in response.data
+
+
+def test_duplicate_patient_id_rejected(admin_login):
+
+    admin_login.post(
+        "/patients/add",
+        data={
+            "patient_id": "888888888",
+            "full_name": "First Patient",
+            "birth_date": "2000-01-01"
+        },
+        follow_redirects=True
+    )
+
+    response = admin_login.post(
+        "/patients/add",
+        data={
+            "patient_id": "888888888",
+            "full_name": "Second Patient",
+            "birth_date": "2001-01-01"
+        },
+        follow_redirects=True
+    )
+
+    assert b"A patient with this ID already exists" in response.data
+
+    patients = Patient.query.filter_by(
+        patient_id="888888888"
+    ).all()
+
+    assert len(patients) == 1
+
+
+def test_visit_future_date_rejected(admin_login):
+
+    patient = Patient(
+        patient_id="999999991",
+        full_name="Future Visit Patient"
+    )
+
+    db.session.add(patient)
+    db.session.commit()
+
+    wound = Wound(
+        patient_id=patient.id,
+        location="Left Arm",
+        status="ACTIVE"
+    )
+
+    db.session.add(wound)
+    db.session.commit()
+
+    response = admin_login.post(
+        f"/wounds/{wound.id}/visits/add",
+        data={
+            "visit_date": "2099-01-01",
+            "length_cm": "3",
+            "width_cm": "2"
+        },
+        follow_redirects=True
+    )
+
+    assert b"Visit date cannot be in the future" in response.data
+
+    visit = Visit.query.filter_by(
+        wound_id=wound.id
+    ).first()
+
+    assert visit is None
+
+
+def test_negative_depth_rejected(admin_login):
+
+    patient = Patient(
+        patient_id="999999992",
+        full_name="Depth Patient"
+    )
+
+    db.session.add(patient)
+    db.session.commit()
+
+    wound = Wound(
+        patient_id=patient.id,
+        location="Right Arm",
+        status="ACTIVE"
+    )
+
+    db.session.add(wound)
+    db.session.commit()
+
+    response = admin_login.post(
+        f"/wounds/{wound.id}/visits/add",
+        data={
+            "visit_date": "2026-10-01",
+            "length_cm": "3",
+            "width_cm": "2",
+            "depth_cm": "-1"
+        },
+        follow_redirects=True
+    )
+
+    assert b"Depth cannot be negative" in response.data
+
+
+def test_wound_area_calculation():
+
+    visit = Visit(
+        wound_id=1,
+        visit_date=None,
+        length_cm=5,
+        width_cm=4
+    )
+
+    assert visit.area == 20
+
+
+def test_wound_area_decimal_calculation():
+
+    visit = Visit(
+        wound_id=1,
+        visit_date=None,
+        length_cm=3.5,
+        width_cm=2.5
+    )
+
+    assert visit.area == 8.75
+
+
+def test_inactive_user_cannot_login(client):
+
+    from models import User
+    from werkzeug.security import generate_password_hash
+
+    user = User(
+        full_name="Inactive User",
+        username="inactive_user",
+        password=generate_password_hash("Test123!"),
+        role="NURSE",
+        is_active=False
+    )
+
+    db.session.add(user)
+    db.session.commit()
+
+    response = client.post(
+        "/login",
+        data={
+            "username": "inactive_user",
+            "password": "Test123!"
+        },
+        follow_redirects=True
+    )
+
+    assert b"This account is inactive" in response.data
+
+
+def test_admin_can_open_reports(admin_login):
+
+    response = admin_login.get(
+        "/reports"
+    )
+
+    assert response.status_code == 200
+
+    assert b"Reports Center" in response.data
+
+
+def test_patient_report_page(admin_login):
+
+    patient = Patient(
+        patient_id="999999993",
+        full_name="Report Patient"
+    )
+
+    db.session.add(patient)
+    db.session.commit()
+
+    response = admin_login.get(
+        f"/patients/{patient.id}/report"
+    )
+
+    assert response.status_code == 200
+
+    assert b"Patient Wound Report" in response.data
